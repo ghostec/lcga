@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/ghostec/lcga/circuits"
+	"github.com/ghostec/lcga/ga"
 )
 
 func main() {
@@ -46,7 +46,17 @@ func main() {
 		[]int{0, 1},
 		[]int{1, 0},
 	}
-	i := circuits.RandomCircuitIndividual(4, 2)
-	i.CalculateFitness(inputs, outputs)
-	fmt.Printf("%f\n", i.Fitness())
+	individualFactory := ga.IndividualFactory(func() ga.Individual {
+		return circuits.RandomCircuitIndividual(4, 2)
+	})
+	algo := ga.NewAlgorithm(ga.AlgorithmConfig{
+		IndividualFactory:   individualFactory,
+		PopulationSize:      10,
+		Epochs:              3,
+		GenerationsPerEpoch: 1000,
+	})
+	algo.Execute(inputs, outputs)
+	// i := circuits.RandomCircuitIndividual(4, 2)
+	// i.CalculateFitness(inputs, outputs)
+	// fmt.Printf("%f\n", i.Fitness())
 }
