@@ -52,7 +52,7 @@ func (c *Circuit) AddOutput(output *Bit) {
 	c.AddNode(output)
 }
 
-func (c *Circuit) AddOperator(operator ds.Node) {
+func (c *Circuit) AddOperator(operator Operator) {
 	c.AddNode(operator)
 }
 
@@ -74,11 +74,16 @@ func (c Circuit) Execute(inputs []int) ([]int, error) {
 	return values[len(values)-len(c.outputs):], nil
 }
 
+type Operator interface {
+	ds.Node
+	RequiredInputs() int
+}
+
 type AndOperator struct {
 	ds.Node
 }
 
-func NewAndOperator() *AndOperator {
+func NewAndOperator() Operator {
 	return &AndOperator{Node: ds.NewCommonNode(nil)}
 }
 
@@ -91,11 +96,15 @@ func (a AndOperator) Value() interface{} {
 	return inputs[0].Value().(int) & inputs[1].Value().(int)
 }
 
+func (a AndOperator) RequiredInputs() int {
+	return 2
+}
+
 type OrOperator struct {
 	ds.Node
 }
 
-func NewOrOperator() *OrOperator {
+func NewOrOperator() Operator {
 	return &OrOperator{Node: ds.NewCommonNode(nil)}
 }
 
@@ -108,36 +117,12 @@ func (o OrOperator) Value() interface{} {
 	return inputs[0].Value().(int) | inputs[1].Value().(int)
 }
 
-// type CircuitIndividual struct {
-// 	circuit *Circuit
-// 	fitness float64
-// }
-//
-// func NewCircuitIndividual() *CircuitIndividual {
-// 	return &CircuitIndividual{circuit: NewCircuit()}
-// }
-//
-// func (c CircuitIndividual) Execute(input interface{}) interface{} {
-// 	output, _ := c.circuit.Execute(input.([]int))
-// 	return output
-// }
-//
-// func (c CircuitIndividual) Fitness() float64 {
-// 	return c.fitness
-// }
-//
-// func (c *CircuitIndividual) CalculateFitness(inputs, outputs []interface{}) {
-// 	f := float64(0)
-// 	for i := range inputs {
-// 		correct := float64(0)
-// 		output := c.Execute(inputs[i]).([]int)
-// 		expected := outputs[i].([]int)
-// 		for j := range output {
-// 			if output[j] == expected[j] {
-// 				correct += 1
-// 			}
-// 		}
-// 		f += correct / float64(len(output))
-// 	}
-// 	c.fitness = f / float64(len(outputs))
-// }
+func (o OrOperator) RequiredInputs() int {
+	return 2
+}
+
+type OperatorFactory func() Operator
+
+func OperatorsFactories() []OperatorFactory {
+	return []OperatorFactory{NewAndOperator, NewOrOperator}
+}
