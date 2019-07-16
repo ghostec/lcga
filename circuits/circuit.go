@@ -1,13 +1,17 @@
-package ga
+package circuits
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ghostec/lcga/ds"
+)
 
 type Bit struct {
-	Node
+	ds.Node
 }
 
 func NewBit(value int) *Bit {
-	return &Bit{Node: NewCommonNode(value)}
+	return &Bit{Node: ds.NewCommonNode(value)}
 }
 
 func (b Bit) Value() interface{} {
@@ -20,21 +24,21 @@ func (b Bit) Value() interface{} {
 	return es[0].Value()
 }
 
-func (b Bit) Clone() Node {
+func (b Bit) Clone() ds.Node {
 	return &Bit{Node: b.Node.Clone()}
 }
 
 type Circuit struct {
-	*CommonGraph
+	ds.Graph
 	inputs  []*Bit
 	outputs []*Bit
 }
 
 func NewCircuit() *Circuit {
 	return &Circuit{
-		CommonGraph: NewCommonGraph(),
-		inputs:      []*Bit{},
-		outputs:     []*Bit{},
+		Graph:   ds.NewCommonGraph(),
+		inputs:  []*Bit{},
+		outputs: []*Bit{},
 	}
 }
 
@@ -48,7 +52,7 @@ func (c *Circuit) AddOutput(output *Bit) {
 	c.AddNode(output)
 }
 
-func (c *Circuit) AddOperator(operator Node) {
+func (c *Circuit) AddOperator(operator ds.Node) {
 	c.AddNode(operator)
 }
 
@@ -59,7 +63,7 @@ func (c Circuit) Execute(inputs []int) ([]int, error) {
 	for i := range inputs {
 		c.inputs[i].SetValue(inputs[i])
 	}
-	topsort, err := TopSort(c)
+	topsort, err := ds.TopSort(c)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +75,14 @@ func (c Circuit) Execute(inputs []int) ([]int, error) {
 }
 
 type AndOperator struct {
-	Node
+	ds.Node
 }
 
 func NewAndOperator() *AndOperator {
-	return &AndOperator{Node: NewCommonNode(nil)}
+	return &AndOperator{Node: ds.NewCommonNode(nil)}
 }
 
-func (a AndOperator) Clone() Node {
+func (a AndOperator) Clone() ds.Node {
 	return &AndOperator{Node: a.Node.Clone()}
 }
 
@@ -88,14 +92,14 @@ func (a AndOperator) Value() interface{} {
 }
 
 type OrOperator struct {
-	Node
+	ds.Node
 }
 
 func NewOrOperator() *OrOperator {
-	return &OrOperator{Node: NewCommonNode(nil)}
+	return &OrOperator{Node: ds.NewCommonNode(nil)}
 }
 
-func (o OrOperator) Clone() Node {
+func (o OrOperator) Clone() ds.Node {
 	return &OrOperator{Node: o.Node.Clone()}
 }
 
@@ -104,15 +108,36 @@ func (o OrOperator) Value() interface{} {
 	return inputs[0].Value().(int) | inputs[1].Value().(int)
 }
 
-type CircuitIndividual struct {
-	*Circuit
-	fitness float64
-}
-
-func NewCircuitIndividual() *CircuitIndividual {
-	return &CircuitIndividual{Circuit: NewCircuit()}
-}
-
-func (c *CircuitIndividual) Execute(input interface{}) interface{} {
-	return nil
-}
+// type CircuitIndividual struct {
+// 	circuit *Circuit
+// 	fitness float64
+// }
+//
+// func NewCircuitIndividual() *CircuitIndividual {
+// 	return &CircuitIndividual{circuit: NewCircuit()}
+// }
+//
+// func (c CircuitIndividual) Execute(input interface{}) interface{} {
+// 	output, _ := c.circuit.Execute(input.([]int))
+// 	return output
+// }
+//
+// func (c CircuitIndividual) Fitness() float64 {
+// 	return c.fitness
+// }
+//
+// func (c *CircuitIndividual) CalculateFitness(inputs, outputs []interface{}) {
+// 	f := float64(0)
+// 	for i := range inputs {
+// 		correct := float64(0)
+// 		output := c.Execute(inputs[i]).([]int)
+// 		expected := outputs[i].([]int)
+// 		for j := range output {
+// 			if output[j] == expected[j] {
+// 				correct += 1
+// 			}
+// 		}
+// 		f += correct / float64(len(output))
+// 	}
+// 	c.fitness = f / float64(len(outputs))
+// }

@@ -1,13 +1,13 @@
-package ga_test
+package ds_test
 
 import (
 	"testing"
 
-	ga "github.com/ghostec/lcga"
+	"github.com/ghostec/lcga/ds"
 )
 
 func TestCommonGraphWithEdge(t *testing.T) {
-	g := ga.NewCommonGraph()
+	g := ds.NewCommonGraph()
 	a := g.NewNode(nil)
 	b := g.NewNode(nil)
 	g.AddEdge(a, b)
@@ -42,7 +42,7 @@ func TestCommonGraphWithEdge(t *testing.T) {
 }
 
 func TestTopsortStraightLine(t *testing.T) {
-	g := ga.NewCommonGraph()
+	g := ds.NewCommonGraph()
 	a := g.NewNodeWithKey("a", nil)
 	b := g.NewNodeWithKey("b", nil)
 	c := g.NewNodeWithKey("c", nil)
@@ -52,14 +52,14 @@ func TestTopsortStraightLine(t *testing.T) {
 	g.AddEdge(b, c)
 	g.AddEdge(c, d)
 	g.AddEdge(d, e)
-	topsort, err := ga.TopSort(g)
+	topsort, err := ds.TopSort(g)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if len(topsort) != 5 {
 		t.Fatalf("Expected topsort to have 5 nodes. Has: %d", len(topsort))
 	}
-	expected := []ga.Node{a, b, c, d, e}
+	expected := []ds.Node{a, b, c, d, e}
 	for i := range expected {
 		if expected[i] != topsort[i] {
 			got := make([]string, 0, len(topsort))
@@ -72,12 +72,12 @@ func TestTopsortStraightLine(t *testing.T) {
 }
 
 func TestTopsortMoreEdges(t *testing.T) {
-	g := ga.NewCommonGraph()
-	a := ga.NewCommonNodeWithKey("a", nil)
-	b := ga.NewCommonNodeWithKey("b", nil)
-	c := ga.NewCommonNodeWithKey("c", nil)
-	d := ga.NewCommonNodeWithKey("d", nil)
-	e := ga.NewCommonNodeWithKey("e", nil)
+	g := ds.NewCommonGraph()
+	a := ds.NewCommonNodeWithKey("a", nil)
+	b := ds.NewCommonNodeWithKey("b", nil)
+	c := ds.NewCommonNodeWithKey("c", nil)
+	d := ds.NewCommonNodeWithKey("d", nil)
+	e := ds.NewCommonNodeWithKey("e", nil)
 	g.AddNode(a)
 	g.AddNode(b)
 	g.AddNode(c)
@@ -91,14 +91,14 @@ func TestTopsortMoreEdges(t *testing.T) {
 	g.AddEdge(c, e)
 	g.AddEdge(d, a)
 	g.AddEdge(d, c)
-	topsort, err := ga.TopSort(g)
+	topsort, err := ds.TopSort(g)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if len(topsort) != 5 {
 		t.Fatalf("Expected topsort to have 5 nodes. Has: %d", len(topsort))
 	}
-	expected := []ga.Node{b, d, a, c, e}
+	expected := []ds.Node{b, d, a, c, e}
 	for i := range expected {
 		if expected[i] != topsort[i] {
 			got := make([]string, 0, len(topsort))

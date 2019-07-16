@@ -1,6 +1,10 @@
-package ga
+package ds
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ghostec/lcga/helpers"
+)
 
 type Graph interface {
 	AddEdge(from, to Node)
@@ -88,12 +92,12 @@ func (g CommonGraph) Degree(node Node) int {
 
 func (g CommonGraph) IncomingEdges(node Node) []Node {
 	in := g.incomingEdges[node.Key()].Slice()
-	return g.getNodesByKeys(toStringSlice(in))
+	return g.getNodesByKeys(helpers.ToStringSlice(in))
 }
 
 func (g CommonGraph) OutgoingEdges(node Node) []Node {
 	out := g.outgoingEdges[node.Key()].Slice()
-	return g.getNodesByKeys(toStringSlice(out))
+	return g.getNodesByKeys(helpers.ToStringSlice(out))
 }
 
 func (g *CommonGraph) getNodesByKeys(keys []string) []Node {

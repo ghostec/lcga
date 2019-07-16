@@ -1,4 +1,4 @@
-package ga
+package ds
 
 type Queue struct {
 	values []interface{}

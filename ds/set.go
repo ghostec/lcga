@@ -1,4 +1,4 @@
-package ga
+package ds
 
 type Set struct {
 	values map[interface{}]bool

@@ -1,4 +1,4 @@
-package ga
+package ds
 
 import "github.com/google/uuid"
 
