@@ -19,6 +19,7 @@ type Graph interface {
 	Nodes() []Node
 	OutgoingEdges(Node) []Node
 	RemoveEdge(from, to Node)
+	RemoveNode(Node)
 }
 
 type Edge struct {
@@ -26,81 +27,89 @@ type Edge struct {
 	To   Node
 }
 
-type CommonGraph struct {
+type SimpleGraph struct {
 	incomingEdges map[string]*Set
 	nodes         map[string]Node
 	outgoingEdges map[string]*Set
 }
 
-func NewCommonGraph() *CommonGraph {
-	return &CommonGraph{
+func NewSimpleGraph() *SimpleGraph {
+	return &SimpleGraph{
 		incomingEdges: map[string]*Set{},
 		nodes:         map[string]Node{},
 		outgoingEdges: map[string]*Set{},
 	}
 }
 
-func (g CommonGraph) Clone() Graph {
-	gg := NewCommonGraph()
-	for k, v := range g.nodes {
-		vv := v.Clone()
-		vv.SetGraph(gg)
-		gg.nodes[k] = vv
+func (g SimpleGraph) Clone() Graph {
+	gg := NewSimpleGraph()
+	for _, v := range g.nodes {
+		gg.AddNode(v.Clone())
 	}
-	for k, v := range g.incomingEdges {
-		gg.incomingEdges[k] = v.Clone()
-	}
-	for k, v := range g.outgoingEdges {
-		gg.outgoingEdges[k] = v.Clone()
+	for _, e := range g.Edges() {
+		gg.AddEdge(e.From, e.To)
 	}
 	return gg
 }
 
-func (g *CommonGraph) NewNode(value interface{}) Node {
-	node := NewCommonNode(value)
+func (g *SimpleGraph) NewNode(value interface{}) Node {
+	node := NewSimpleNode(value)
 	g.AddNode(node)
 	return node
 }
 
-func (g *CommonGraph) NewNodeWithKey(key string, value interface{}) Node {
-	node := NewCommonNode(value)
+func (g *SimpleGraph) NewNodeWithKey(key string, value interface{}) Node {
+	node := NewSimpleNode(value)
 	node.key = key
 	g.AddNode(node)
 	return node
 }
 
-func (g *CommonGraph) AddNode(node Node) {
+func (g *SimpleGraph) AddNode(node Node) {
 	node.SetGraph(g)
 	g.incomingEdges[node.Key()] = NewSet()
 	g.nodes[node.Key()] = node
 	g.outgoingEdges[node.Key()] = NewSet()
 }
 
-func (g *CommonGraph) AddEdge(from, to Node) {
+func (g *SimpleGraph) AddEdge(from, to Node) {
 	g.incomingEdges[to.Key()].Add(from.Key())
 	g.outgoingEdges[from.Key()].Add(to.Key())
 }
 
-func (g *CommonGraph) RemoveEdge(from, to Node) {
+func (g *SimpleGraph) RemoveEdge(from, to Node) {
 	g.incomingEdges[to.Key()].Remove(from.Key())
 	g.outgoingEdges[from.Key()].Remove(to.Key())
 }
 
-func (g CommonGraph) Degree(node Node) int {
+func (g *SimpleGraph) RemoveNode(node Node) {
+	nodeKey := node.Key()
+	delete(g.incomingEdges, nodeKey)
+	delete(g.outgoingEdges, nodeKey)
+	delete(g.nodes, nodeKey)
+	for _, set := range g.outgoingEdges {
+		set.Remove(nodeKey)
+	}
+	for _, set := range g.incomingEdges {
+		set.Remove(nodeKey)
+	}
+}
+
+func (g SimpleGraph) Degree(node Node) int {
 	return g.incomingEdges[node.Key()].Size()
 }
 
-func (g CommonGraph) IncomingEdges(node Node) []Node {
+func (g SimpleGraph) IncomingEdges(node Node) []Node {
 	in := g.incomingEdges[node.Key()].Slice()
 	return g.getNodesByKeys(helpers.ToStringSlice(in))
 }
 
-func (g CommonGraph) OutgoingEdges(node Node) []Node {
+func (g SimpleGraph) OutgoingEdges(node Node) []Node {
 	out := g.outgoingEdges[node.Key()].Slice()
 	return g.getNodesByKeys(helpers.ToStringSlice(out))
 }
 
-func (g *CommonGraph) getNodesByKeys(keys []string) []Node {
+func (g *SimpleGraph) getNodesByKeys(keys []string) []Node {
 	ns := make([]Node, 0, len(keys))
 	for _, key := range keys {
 		ns = append(ns, g.nodes[key])
@@ -108,7 +117,7 @@ func (g *CommonGraph) getNodesByKeys(keys []string) []Node {
 	return ns
 }
 
-func (g CommonGraph) Nodes() []Node {
+func (g SimpleGraph) Nodes() []Node {
 	list := make([]Node, 0, len(g.nodes))
 	for _, node := range g.nodes {
 		list = append(list, node)
@@ -116,11 +125,11 @@ func (g CommonGraph) Nodes() []Node {
 	return list
 }
 
-func (g CommonGraph) Node(key string) Node {
+func (g SimpleGraph) Node(key string) Node {
 	return g.nodes[key]
 }
 
-func (g CommonGraph) Edges() []Edge {
+func (g SimpleGraph) Edges() []Edge {
 	list := make([]Edge, 0)
 	for fromKey, set := range g.outgoingEdges {
 		toKeys := set.Slice()

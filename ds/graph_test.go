@@ -6,8 +6,8 @@ import (
 	"github.com/ghostec/lcga/ds"
 )
 
-func TestCommonGraphWithEdge(t *testing.T) {
-	g := ds.NewCommonGraph()
+func TestSimpleGraphWithEdge(t *testing.T) {
+	g := ds.NewSimpleGraph()
 	a := g.NewNode(nil)
 	b := g.NewNode(nil)
 	g.AddEdge(a, b)
@@ -42,7 +42,7 @@ func TestCommonGraphWithEdge(t *testing.T) {
 }
 
 func TestTopsortStraightLine(t *testing.T) {
-	g := ds.NewCommonGraph()
+	g := ds.NewSimpleGraph()
 	a := g.NewNodeWithKey("a", nil)
 	b := g.NewNodeWithKey("b", nil)
 	c := g.NewNodeWithKey("c", nil)
@@ -72,12 +72,12 @@ func TestTopsortStraightLine(t *testing.T) {
 }
 
 func TestTopsortMoreEdges(t *testing.T) {
-	g := ds.NewCommonGraph()
-	a := ds.NewCommonNodeWithKey("a", nil)
-	b := ds.NewCommonNodeWithKey("b", nil)
-	c := ds.NewCommonNodeWithKey("c", nil)
-	d := ds.NewCommonNodeWithKey("d", nil)
-	e := ds.NewCommonNodeWithKey("e", nil)
+	g := ds.NewSimpleGraph()
+	a := ds.NewSimpleNodeWithKey("a", nil)
+	b := ds.NewSimpleNodeWithKey("b", nil)
+	c := ds.NewSimpleNodeWithKey("c", nil)
+	d := ds.NewSimpleNodeWithKey("d", nil)
+	e := ds.NewSimpleNodeWithKey("e", nil)
 	g.AddNode(a)
 	g.AddNode(b)
 	g.AddNode(c)

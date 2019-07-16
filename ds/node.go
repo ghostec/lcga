@@ -12,53 +12,53 @@ type Node interface {
 	Clone() Node
 }
 
-type CommonNode struct {
+type SimpleNode struct {
 	graph Graph
 	key   string
 	value interface{}
 }
 
-func NewCommonNode(value interface{}) *CommonNode {
-	return &CommonNode{
+func NewSimpleNode(value interface{}) *SimpleNode {
+	return &SimpleNode{
 		key:   uuid.New().String(),
 		value: value,
 	}
 }
 
-func NewCommonNodeWithKey(key string, value interface{}) *CommonNode {
-	return &CommonNode{
+func NewSimpleNodeWithKey(key string, value interface{}) *SimpleNode {
+	return &SimpleNode{
 		key:   key,
 		value: value,
 	}
 }
 
-func (c CommonNode) Clone() Node {
-	return &CommonNode{
+func (c SimpleNode) Clone() Node {
+	return &SimpleNode{
 		key:   c.key,
 		value: c.value,
 	}
 }
 
-func (c CommonNode) Key() string {
+func (c SimpleNode) Key() string {
 	return c.key
 }
 
-func (c CommonNode) Value() interface{} {
+func (c SimpleNode) Value() interface{} {
 	return c.value
 }
 
-func (c *CommonNode) SetValue(value interface{}) {
+func (c *SimpleNode) SetValue(value interface{}) {
 	c.value = value
 }
 
-func (c *CommonNode) Degree() int {
+func (c *SimpleNode) Degree() int {
 	return c.graph.Degree(c)
 }
 
-func (c CommonNode) Graph() Graph {
+func (c SimpleNode) Graph() Graph {
 	return c.graph
 }
 
-func (c *CommonNode) SetGraph(g Graph) {
+func (c *SimpleNode) SetGraph(g Graph) {
 	c.graph = g
 }
